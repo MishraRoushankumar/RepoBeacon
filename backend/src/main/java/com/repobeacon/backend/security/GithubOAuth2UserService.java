@@ -27,7 +27,7 @@ public class GithubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         ? String.join(",", userRequest.getAccessToken().getScopes())
         : "read:user,repo";
 
-    User user = userService.upsertFromGithub(githubUser.getAttributes(), accessToken, scopes);
+    User user = userService.upsertFromGitHub(githubUser.getAttributes(), accessToken, scopes);
     return new AppUserPrincipal(user, githubUser.getAttributes());
   }
 }

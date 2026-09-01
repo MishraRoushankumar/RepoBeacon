@@ -9,17 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.repobeacon.backend.entity.User;
 import com.repobeacon.backend.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-  public final UserRepository userRepository;
-  public final TextEncryptor tokenEncryptor;
 
-  public User upsertFromGithub(Map<String, Object> attributes, String accessToken, String scopes) {
+  private final UserRepository userRepository;
+  private final TextEncryptor tokenEncryptor;
 
+  @Transactional
+  public User upsertFromGitHub(Map<String, Object> attributes, String accessToken, String scopes) {
     Long githubId = toLong(attributes.get("id"));
     String login = String.valueOf(attributes.get("login"));
     String name = attributes.get("name") != null
@@ -37,15 +37,14 @@ public class UserService {
     user.setDisplayName(name);
     user.setAvatarUrl(avatarUrl);
     user.setAccessToken(encryptedToken);
-    user.setTokenScope(scopes);
-
+    user.setTokenScopes(scopes);
     return userRepository.save(user);
-
   }
 
   @Transactional(readOnly = true)
-  public User requiredById(UUID id) {
-    return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+  public User requireById(UUID id) {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
   }
 
   public String decryptAccessToken(User user) {
@@ -53,10 +52,9 @@ public class UserService {
   }
 
   private static Long toLong(Object value) {
-    if (value instanceof Number number)
+    if (value instanceof Number number) {
       return number.longValue();
-
+    }
     return Long.parseLong(String.valueOf(value));
   }
-
 }
