@@ -1,3 +1,5 @@
+@import url("https://fonts.cdnfonts.com/css/clash-display");
+@import url("https://fonts.cdnfonts.com/css/satoshi");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -49,6 +51,8 @@
 }
 
 :root {
+  --font-sans: "Satoshi", sans-serif;
+  --font-heading: "Clash Display", sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -123,11 +127,21 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
   }
 }
