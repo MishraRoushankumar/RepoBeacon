@@ -48,7 +48,7 @@ const LoginContent = () => {
 
   return (
     <div className="relative flex min-h-svh flex-col overflow-hidden bg-background">
-      <div className=" absolute inset-0 bg-[radial-gradient(ellipse_at_top,oklch(from_var(--primary)_1_c_h/0.1),transparent_55%)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,oklch(from_var(--primary)_1_c_h/0.1),transparent_55%)]">
         <header className="relative z-10 flex h-14 items-center justify-between px-4">
           <Link href="/">
             <BrandMark />
