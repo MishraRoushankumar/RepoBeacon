@@ -11,6 +11,7 @@ import {
 
 import { RepoCard } from "@/components/dashboard/repo-card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,6 +19,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRepos } from "@/hooks/use-repos";
 
@@ -58,6 +66,26 @@ function StatCard({
 
 export function OverviewDashboard() {
   const reposQuery = useRepos();
+
+  if (reposQuery.isError) {
+    return (
+      <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+        <Empty className="border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FolderGit2 />
+            </EmptyMedia>
+            <EmptyTitle>Couldn’t load repositories</EmptyTitle>
+            <EmptyDescription>
+              {(reposQuery.error as Error).message}
+            </EmptyDescription>
+          </EmptyHeader>
+          <Button onClick={() => void reposQuery.refetch()}>Try again</Button>
+        </Empty>
+      </div>
+    );
+  }
+
   const repos = reposQuery.data ?? [];
 
   const readyCount = repos.filter(

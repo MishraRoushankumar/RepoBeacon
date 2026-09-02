@@ -120,7 +120,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
                 {repo.filesProcessed}/{repo.filesTotal || "?"}
               </span>
             </div>
-            <Progress value={progress || 8} />
+            <Progress value={progress} />
           </div>
         )}
 
