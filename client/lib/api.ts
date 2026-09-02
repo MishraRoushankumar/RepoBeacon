@@ -1,0 +1,67 @@
+export type User = {
+  id: string;
+  githubId: string;
+  githubUsername: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
+
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export function getApiBaseUrl() {
+  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080";
+}
+
+export function getGithubLoginUrl(next?: string) {
+  const baseUrl = `${getApiBaseUrl()}/oauth2/authorization/github`;
+  if (!next) return baseUrl;
+  const params = new URLSearchParams({ state: next });
+  return `${baseUrl}?${params.toString()}`;
+}
+
+async function parseError(res: Response): Promise<string> {
+  try {
+    const data = await res.json();
+    return data.message ?? data.error ?? res.statusText;
+  } catch {
+    return res.statusText || "Request failed";
+  }
+}
+
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
+  const res = await fetch(`${getApiBaseUrl()}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new ApiError(res.status, await parseError(res));
+  }
+
+  if (res.status == 204) {
+    return undefined as T;
+  }
+
+  return res.json() as Promise<T>;
+}
+
+export const api = {
+  me: () => apiFetch<User>("/api/auth/me"),
+  logout: () =>
+    apiFetch<void>("/api/auth/logout", {
+      method: "POST",
+    }),
+};

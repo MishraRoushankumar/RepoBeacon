@@ -1,24 +1,9 @@
 import type { Metadata } from "next";
-import {
-  Geist,
-  Geist_Mono,
-  IBM_Plex_Sans,
-  Source_Sans_3,
-} from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme-provider";
 import QueryProvider from "@/providers/query-provider";
-
-const sourceSans3Heading = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-heading",
-});
-
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,9 +29,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         "antialiased",
         geistSans.variable,
         geistMono.variable,
-        "font-sans",
-        ibmPlexSans.variable,
-        sourceSans3Heading.variable,
       )}
       suppressHydrationWarning
     >

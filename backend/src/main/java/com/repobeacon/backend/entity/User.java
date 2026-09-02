@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
 @Builder
 public class User {
 
@@ -29,13 +29,13 @@ public class User {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(name = "github_id", unique = true, nullable = false)
+  @Column(name = "github_id", nullable = false, unique = true)
   private Long githubId;
 
-  @Column(name = "github_username", length = 100, nullable = false)
+  @Column(name = "github_username", nullable = false, length = 100)
   private String githubUsername;
 
-  @Column(name = "display_user", length = 100, nullable = false)
+  @Column(name = "display_name", nullable = false, length = 200)
   private String displayName;
 
   @Column(name = "avatar_url", length = 500)
@@ -44,10 +44,10 @@ public class User {
   @Column(name = "access_token", nullable = false, columnDefinition = "TEXT")
   private String accessToken;
 
-  @Column(name = "token_scope", length = 500)
-  private String TokenScope;
+  @Column(name = "token_scopes", length = 500)
+  private String tokenScopes;
 
-  @Column(name = "created_at", updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
   @PrePersist

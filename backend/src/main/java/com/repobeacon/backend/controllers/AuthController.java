@@ -11,17 +11,17 @@ import com.repobeacon.backend.dto.UserResponse;
 import com.repobeacon.backend.entity.User;
 import com.repobeacon.backend.security.AppUserPrincipal;
 import com.repobeacon.backend.security.CurrentUser;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
   private final CurrentUser currentUser;
 
-  @GetMapping("/login")
-  public Map<String, Object> loginUrl() {
+  @GetMapping("/login-url")
+  public Map<String, String> loginUrl() {
     return Map.of("url", "/oauth2/authorization/github");
   }
 
@@ -29,7 +29,6 @@ public class AuthController {
   public ResponseEntity<UserResponse> me() {
     AppUserPrincipal principal = currentUser.require();
     User user = principal.getUser();
-
     return ResponseEntity.ok(new UserResponse(
         user.getId(),
         user.getGithubId(),
@@ -37,5 +36,4 @@ public class AuthController {
         user.getDisplayName(),
         user.getAvatarUrl()));
   }
-
 }
