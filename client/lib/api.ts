@@ -19,8 +19,11 @@ export function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080";
 }
 
-export function getGithubLoginUrl() {
-  return `${getApiBaseUrl()}/oauth2/authorization/github`;
+export function getGithubLoginUrl(next?: string) {
+  const baseUrl = `${getApiBaseUrl()}/oauth2/authorization/github`;
+  if (!next) return baseUrl;
+  const params = new URLSearchParams({ state: next });
+  return `${baseUrl}?${params.toString()}`;
 }
 
 async function parseError(res: Response): Promise<string> {

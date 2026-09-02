@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/lib/api";
+import { ApiError, api } from "@/lib/api";
 import { queryKeys } from "@/lib/query-keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,12 @@ export function setAuthCookie(authed: boolean) {
 export function useCurrentUser() {
   return useQuery({
     queryKey: queryKeys.auth.me(),
+    retry: (failureCount, error) => {
+      if (error instanceof ApiError && error.status === 401) {
+        return false;
+      }
+      return true;
+    },
     queryFn: async () => {
       try {
         const user = await api.me();

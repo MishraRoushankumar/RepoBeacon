@@ -130,6 +130,7 @@
   }
   body {
     @apply bg-background text-foreground;
+
     font-family: var(--font-sans);
   }
   button:not(:disabled),
