@@ -31,6 +31,11 @@ public class RepoService {
   public List<RepositoryResponse> syncAndListRepos(UUID userId) {
     User user = userService.requireById(userId);
     String token = userService.decryptAccessToken(user);
+
+    if (token == null || token.isBlank()) {
+      throw new IllegalStateException("GitHub access token is missing");
+    }
+
     List<Map<String, Object>> remoteRepos = githubApiClient.listUserRepos(token);
 
     List<Repository> saved = new ArrayList<>();
