@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(UnauthorizedException.class)
-  ResponseEntity<Map<String, Object>> handleBadRequest(UnauthorizedException ex) {
+  ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
     return error(HttpStatus.UNAUTHORIZED, ex.getMessage());
   }
 
@@ -39,14 +40,22 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+    if (ex instanceof org.springframework.web.context.request.async.AsyncRequestNotUsableException || 
+        ex.getCause() instanceof java.io.IOException) {
+        // Log at debug level to avoid spam on client disconnects
+        return null;
+    }
     return error(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage() != null ? ex.getMessage() : "Unexpected error");
   }
 
   private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {
-    return ResponseEntity.status(status).body(Map.of(
-        "status", status.value(),
-        "error", status.getReasonPhrase(),
-        "message", message,
-        "timestamp", Instant.now().toString()));
+    return ResponseEntity.status(status)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(Map.of(
+            "status", status.value(),
+            "error", status.getReasonPhrase(),
+            "message", message,
+            "timestamp", Instant.now().toString()));
   }
 }
+

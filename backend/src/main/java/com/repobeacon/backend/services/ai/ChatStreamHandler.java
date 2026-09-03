@@ -43,7 +43,7 @@ public class ChatStreamHandler {
     try {
       emitter.send(SseEmitter
           .event()
-          .name("user message")
+          .name("user_message")
           .data(savedUserMessage));
 
       ChatClient.builder(chatModel)
@@ -54,15 +54,14 @@ public class ChatStreamHandler {
           .stream()
           .content()
           .doOnNext(token -> appendToken(emitter, fullReply, token))
-          .doOnError(err -> {
-            log.error("Chat stream error", err);
-            emitter.completeWithError(err);
-          })
           .doOnComplete(() -> completeStream(emitter, sessionId, fullReply, citations))
-          .subscribe();
+          .subscribe(
+              token -> {},
+              err -> handleStreamError(emitter, err)
+          );
 
     } catch (Exception e) {
-      emitter.completeWithError(e);
+      handleStreamError(emitter, e);
     }
 
     return emitter;
@@ -98,7 +97,29 @@ public class ChatStreamHandler {
       emitter.send(SseEmitter.event().name("done").data("[DONE]"));
       emitter.complete();
     } catch (Exception ex) {
-      emitter.completeWithError(ex);
+      handleStreamError(emitter, ex);
+    }
+  }
+
+  private void handleStreamError(SseEmitter emitter, Throwable err) {
+    if (err instanceof org.springframework.web.context.request.async.AsyncRequestNotUsableException || err.getCause() instanceof java.io.IOException) {
+      log.debug("Client disconnected during chat stream: {}", err.getMessage());
+    } else {
+      log.error("Chat stream error", err);
+    }
+    try {
+      String errorMessage = err.getMessage() != null ? err.getMessage() : "Error generating reply";
+      emitter.send(SseEmitter.event()
+          .name("error")
+          .data(java.util.Map.of("message", errorMessage), MediaType.APPLICATION_JSON));
+    } catch (Exception ex) {
+      log.debug("Failed to send SSE error event", ex);
+    } finally {
+      try {
+        emitter.complete();
+      } catch (Exception ex) {
+        log.debug("Failed to complete SSE emitter", ex);
+      }
     }
   }
 

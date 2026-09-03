@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "chat_sessions")
+@Table(name = "chat_messages")
 @Getter
 @Setter
 @NoArgsConstructor
