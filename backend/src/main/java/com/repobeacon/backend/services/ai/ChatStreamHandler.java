@@ -15,6 +15,9 @@ import com.repobeacon.backend.entity.ChatMessage;
 import com.repobeacon.backend.entity.MessageRole;
 import com.repobeacon.backend.repository.ChatMessageRepository;
 
+import reactor.core.Disposable;
+import reactor.core.Disposables;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +41,12 @@ public class ChatStreamHandler {
       String userPrompt) {
 
     SseEmitter emitter = new SseEmitter(RagSettings.STREAM_TIMEOUT_MS);
+    Disposable.Swap subscription = Disposables.swap();
+
+    emitter.onCompletion(subscription::dispose);
+    emitter.onTimeout(subscription::dispose);
+    emitter.onError(err -> subscription.dispose());
+
     StringBuilder fullReply = new StringBuilder();
 
     try {
@@ -46,7 +55,7 @@ public class ChatStreamHandler {
           .name("user_message")
           .data(savedUserMessage));
 
-      ChatClient.builder(chatModel)
+      Disposable disposable = ChatClient.builder(chatModel)
           .build()
           .prompt()
           .system(systemPrompt)
@@ -59,6 +68,7 @@ public class ChatStreamHandler {
               token -> {},
               err -> handleStreamError(emitter, err)
           );
+      subscription.update(disposable);
 
     } catch (Exception e) {
       handleStreamError(emitter, e);
@@ -101,17 +111,16 @@ public class ChatStreamHandler {
     }
   }
 
-  private void handleStreamError(SseEmitter emitter, Throwable err) {
+  void handleStreamError(SseEmitter emitter, Throwable err) {
     if (err instanceof org.springframework.web.context.request.async.AsyncRequestNotUsableException || err.getCause() instanceof java.io.IOException) {
       log.debug("Client disconnected during chat stream: {}", err.getMessage());
     } else {
       log.error("Chat stream error", err);
     }
     try {
-      String errorMessage = err.getMessage() != null ? err.getMessage() : "Error generating reply";
       emitter.send(SseEmitter.event()
           .name("error")
-          .data(java.util.Map.of("message", errorMessage), MediaType.APPLICATION_JSON));
+          .data(java.util.Map.of("message", "Error generating reply"), MediaType.APPLICATION_JSON));
     } catch (Exception ex) {
       log.debug("Failed to send SSE error event", ex);
     } finally {

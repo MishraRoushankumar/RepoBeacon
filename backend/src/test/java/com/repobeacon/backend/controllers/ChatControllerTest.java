@@ -111,4 +111,37 @@ class ChatControllerTest {
         .andExpect(jsonPath("$.error").value("Internal Server Error"))
         .andExpect(jsonPath("$.message").value("Something unexpected went wrong"));
   }
+
+  @Test
+  void sendMessage_whenRuntimeExceptionWrappingIOException_returnsJsonError() throws Exception {
+    UUID sessionId = UUID.randomUUID();
+    when(chatService.streamReply(any(), eq(sessionId), any()))
+        .thenThrow(new RuntimeException("Failed to read resource", new java.io.IOException("Connection reset")));
+
+    mockMvc.perform(post("/api/chat/sessions/" + sessionId + "/messages")
+            .requestAttr(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, Set.of(MediaType.TEXT_EVENT_STREAM))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"content\":\"Hello\"}")
+            .accept(MediaType.TEXT_EVENT_STREAM))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.status").value(500))
+        .andExpect(jsonPath("$.error").value("Internal Server Error"))
+        .andExpect(jsonPath("$.message").value("Failed to read resource"));
+  }
+
+  @Test
+  void sendMessage_whenAsyncRequestNotUsableException_suppressesResponse() throws Exception {
+    UUID sessionId = UUID.randomUUID();
+    when(chatService.streamReply(any(), eq(sessionId), any()))
+        .thenThrow(new RuntimeException(new org.springframework.web.context.request.async.AsyncRequestNotUsableException("Client disconnected")));
+
+    mockMvc.perform(post("/api/chat/sessions/" + sessionId + "/messages")
+            .requestAttr(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, Set.of(MediaType.TEXT_EVENT_STREAM))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"content\":\"Hello\"}")
+            .accept(MediaType.TEXT_EVENT_STREAM))
+        .andExpect(status().isOk())
+        .andExpect(content().string(""));
+  }
 }

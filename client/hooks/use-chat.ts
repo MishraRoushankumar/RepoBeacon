@@ -119,6 +119,7 @@ export function useStreamChat(sessionId: string | null) {
 
   const stop = useCallback(() => {
     abortRef.current?.abort();
+    setStreamText("");
     setStreaming(false);
   }, []);
 

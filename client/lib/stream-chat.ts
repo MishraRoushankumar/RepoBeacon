@@ -43,6 +43,7 @@ export async function streamChatMessage(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let doneReceived = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -78,6 +79,7 @@ export async function streamChatMessage(
         } else if (event === "assistant_message") {
           handlers.onAssistantMessage?.(JSON.parse(data) as ChatMessage);
         } else if (event === "done") {
+          doneReceived = true;
           handlers.onDone?.();
         } else if (event === "error") {
           let errMsg = "Stream error";
@@ -88,7 +90,6 @@ export async function streamChatMessage(
             errMsg = data;
           }
           const err = new Error(errMsg);
-          handlers.onError?.(err);
           throw err;
         }
       } catch (err) {
@@ -100,5 +101,7 @@ export async function streamChatMessage(
     }
   }
 
-  handlers.onDone?.();
+  if (!doneReceived) {
+    handlers.onDone?.();
+  }
 }
