@@ -20,10 +20,18 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useCurrentUser, useLogout } from "@/hooks/use-auth";
 
+import { useEffect, useState } from "react";
+
 export function SettingsDashboard() {
   const { data: user } = useCurrentUser();
   const logout = useLogout();
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isDark = resolvedTheme === "dark";
 
   return (
@@ -97,7 +105,7 @@ export function SettingsDashboard() {
               <Sun className="size-4 text-muted-foreground" />
               <Switch
                 id="dark-mode"
-                checked={isDark}
+                checked={mounted ? isDark : false}
                 onCheckedChange={(checked) =>
                   setTheme(checked ? "dark" : "light")
                 }
@@ -112,7 +120,7 @@ export function SettingsDashboard() {
             <div className="space-y-1">
               <Label>Theme selector</Label>
               <p className="text-sm text-muted-foreground">
-                Current theme: {theme ?? "system"}
+                Current theme: {mounted ? (theme ?? "system") : "system"}
               </p>
             </div>
             <ThemeToggle />

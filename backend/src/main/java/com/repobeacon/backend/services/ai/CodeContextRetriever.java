@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CodeContextRetreiver {
+public class CodeContextRetriever {
 
   private static final String NO_MATCHES = "(no matching code chunks found)";
 
