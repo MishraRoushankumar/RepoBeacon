@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +52,14 @@ public class RepoController {
   public ResponseEntity<RepositoryResponse> index(@PathVariable UUID id) {
     UUID userId = currentUser.require().getId();
     Repository repo = indexingService.startIndexing(id, userId);
-    indexingService.indexAsync(id, userId);
+    try {
+      indexingService.indexAsync(id, userId);
+    } catch (RejectedExecutionException ex) {
+      Repository failedRepo = indexingService.markFailed(id, "Indexing task queue is full. Please try again later.");
+      if (failedRepo != null) {
+        repo = failedRepo;
+      }
+    }
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(repoService.toResponse(repo));
   }
 

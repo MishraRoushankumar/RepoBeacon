@@ -25,8 +25,11 @@ public class GoogleGenAiEmbeddingConfig {
     return new EmbeddingModel() {
       @Override
       public EmbeddingResponse call(EmbeddingRequest request) {
+        String selectedModel = (request.getOptions() != null && request.getOptions().getModel() != null)
+            ? request.getOptions().getModel()
+            : model;
         var response = client.models.embedContent(
-            request.getOptions().getModel() != null ? request.getOptions().getModel() : model,
+            selectedModel,
             request.getInstructions(),
             EmbedContentConfig.builder().outputDimensionality(1536).build());
         var vectors = response.embeddings()
