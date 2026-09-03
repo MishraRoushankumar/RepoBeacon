@@ -19,7 +19,7 @@ sequenceDiagram
     Backend-->>Client: Repository list
 
     User->>Client: Sync repository
-    Client->>Backend: POST /api/repos/{id}/sync
+    Client->>Backend: GET /api/repos?refresh=true
     Backend->>GitHub: Fetch repository data
     GitHub-->>Backend: Repository data
     Backend->>DB: Update repository

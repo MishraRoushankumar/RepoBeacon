@@ -5,6 +5,10 @@ import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Citation, Repository } from "@/lib/api";
 
+function encodePath(path: string): string {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
 export function citationHref(repo: Repository, citation: Citation) {
   const line =
     citation.startLine != null
@@ -14,7 +18,7 @@ export function citationHref(repo: Repository, citation: Citation) {
             : ""
         }`
       : "";
-  return `https://github.com/${repo.fullName}/blob/${repo.defaultBranch}/${citation.filePath}${line}`;
+  return `https://github.com/${repo.fullName}/blob/${encodePath(repo.defaultBranch)}/${encodePath(citation.filePath)}${line}`;
 }
 
 export function CitationChips({

@@ -10,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -40,8 +42,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
-    if (ex instanceof org.springframework.web.context.request.async.AsyncRequestNotUsableException || 
-        ex.getCause() instanceof java.io.IOException) {
+    if (ex instanceof AsyncRequestNotUsableException || 
+        ex.getCause() instanceof AsyncRequestNotUsableException) {
         // Log at debug level to avoid spam on client disconnects
         return null;
     }
