@@ -2,10 +2,19 @@
 
 # RepoBeacon
 
-### AI-powered codebase assistant for understanding and interacting with GitHub repositories.
+### AI-powered codebase assistant for understanding and interacting with GitHub repositories
 
 <p>
-  <strong>Full-stack • GitHub • Spring Boot • Next.js • RAG</strong>
+  <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?logo=openjdk&logoColor=white" alt="Java 17+">
+  <img src="https://img.shields.io/badge/Spring_Boot-4.1.1-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.1.1">
+  <img src="https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white" alt="Next.js 16">
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL 16">
+  <img src="https://img.shields.io/badge/pgvector-Enabled-336791" alt="pgvector">
+  <img src="https://img.shields.io/badge/Gemini-GenAI-4285F4?logo=google&logoColor=white" alt="Google Gemini">
+</p>
+
+<p>
+  <strong>Full-stack RAG • GitHub Integration • Streaming AI Chat</strong>
 </p>
 
 <p>
@@ -13,9 +22,13 @@
   •
   <a href="#architecture">Architecture</a>
   •
+  <a href="#core-flows">Core Flows</a>
+  •
   <a href="#tech-stack">Tech Stack</a>
   •
   <a href="#getting-started">Getting Started</a>
+  •
+  <a href="#documentation">Documentation</a>
   •
   <a href="#roadmap">Roadmap</a>
 </p>
@@ -24,139 +37,183 @@
 
 ---
 
-RepoBeacon is a full-stack application that aims to help developers understand their GitHub codebases through an AI-powered, context-aware interface.
-
-The project is currently under active development.
-
 ## Current Status
 
-| Area                       | Status      |
-| -------------------------- | ----------- |
-| GitHub OAuth2              | Complete    |
-| Landing Page               | Complete    |
-| Dashboard Shell            | Complete    |
-| Repository Management      | In Progress |
-| Repository Synchronization | In Progress |
-| RAG / GenAI                | Planned     |
+### v2.0.0 — RAG & GenAI
 
-### Completed
+RepoBeacon now supports end-to-end AI-powered codebase understanding. Repositories can be indexed into vector embeddings, relevant code can be retrieved through repository-scoped semantic search, and Gemini can use that context to generate grounded responses. The release also includes persistent chat sessions, streaming responses through SSE, and source citations for retrieved code.
 
-- GitHub OAuth2 authentication
-- GitHub login flow
-- User session handling
-- Landing page
-- Application dashboard shell
-- Initial frontend UI foundation
-- Backend authentication foundation
-- PostgreSQL database integration
-- Docker-based local PostgreSQL environment
+### Next
 
-### In Progress
-
-- Repository management
-- GitHub repository synchronization
-- Application settings
-- Complete dashboard functionality
-- Frontend/backend integration for repository features
-
-### Planned
-
-- Repository source-code indexing
-- Code chunking
-- OpenAI embeddings
-- PostgreSQL + pgvector vector search
-- Retrieval-Augmented Generation (RAG)
-- Context-aware codebase chat
-- Streaming AI responses using SSE
-- Source-code citations
+- Production deployment
+- CI/CD
+- Further RAG and retrieval improvements
 
 ---
 
 ## Vision
 
-RepoBeacon is designed to turn a GitHub repository into an interactive knowledge base.
-
-The long-term workflow is:
+RepoBeacon is designed to make large GitHub repositories easier to understand and interact with through AI.
 
 ```mermaid
-flowchart
-    A[GitHub Repository] --> B[Repository Sync] --> C[Source Code Indexing]
-    C --> D[Code Chunking]
-    D --> E[OpenAI Embeddings]
-    E --> F[(PostgreSQL + pgvector)]
-    F --> G[Semantic Retrieval]
-    G --> H[AI Context Construction]
-    H --> I[Context-Aware Chat]
-    I --> J[Answer + Source Citations]
+flowchart LR
+    A[GitHub Repository] --> B[Repository Indexing]
+    B --> C[Code Embeddings]
+    C --> D[Vector Search]
+    D --> E[AI-Powered Context]
+    E --> F[Developer]
 ```
 
-The goal is to allow developers to ask questions about their codebase and receive answers grounded in the actual repository contents.
+The goal is to provide developers with a context-aware assistant that can understand their codebase, retrieve relevant source code, and answer questions based on the actual repository rather than generic assumptions.
 
 ---
 
 ## Architecture
 
-The planned architecture consists of three primary components:
+RepoBeacon follows a layered architecture where the Next.js frontend communicates with a Spring Boot backend, which orchestrates GitHub integration, repository indexing, vector retrieval, and AI-powered responses.
 
 ```mermaid
 flowchart LR
-    U[User] --> F[Next.js Frontend]
+    A[Next.js Frontend] --> B[Spring Boot Backend]
 
-    F -->|REST / SSE| B[Spring Boot Backend]
-
-    B -->|OAuth2 / API| G[GitHub API]
-    B --> DB[(PostgreSQL + pgvector)]
-    B --> AI[OpenAI]
-
-    DB --> V[Vector Store]
-
+    B --> C[GitHub API]
+    B --> D[(PostgreSQL + pgvector)]
+    B --> E[Google GenAI]
 ```
 
-The AI/RAG components will be integrated into the backend as development progresses.
+The backend acts as the central orchestration layer, handling authentication, repository synchronization, indexing, retrieval, and chat while the frontend provides the developer-facing interface.
+For a detailed overview of the system architecture and component responsibilities, see [`docs/architecture.md`](docs/architecture.md).
+
+---
+
+## Core Flows
+
+### Authentication
+
+GitHub OAuth2 is used to authenticate users and establish secure application sessions.
+
+→ [Detailed authentication flow](docs/authentication.md)
+
+### Repository Sync
+
+Users can connect and synchronize their GitHub repositories with RepoBeacon for indexing and AI-powered code understanding.
+
+→ [Detailed repository synchronization flow](docs/repository-sync.md)
+
+### Repository Indexing
+
+Repositories are processed asynchronously, filtered, chunked, embedded, and stored in PostgreSQL with pgvector for semantic retrieval.
+
+→ [Detailed repository indexing flow](docs/repository-indexing.md)
+
+### RAG Chat
+
+User questions are matched against repository context, passed to Gemini for grounded response generation, and streamed back through SSE with source citations.
+
+→ [Detailed RAG chat flow](docs/rag-chat.md)
 
 ---
 
 ## Tech Stack
 
-| Layer              | Technologies                                                        |
-| ------------------ | ------------------------------------------------------------------- |
-| **Frontend**       | Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query |
-| **Backend**        | Java, Spring Boot, Spring Security, Spring Data JPA, Spring AI      |
-| **Database**       | PostgreSQL, pgvector, Flyway                                        |
-| **AI**             | OpenAI, `gpt-4o-mini`, `text-embedding-3-small`                     |
-| **Infrastructure** | Docker, Docker Compose                                              |
+<div align="center">
+<table >
+<tr>
+<td width="50%">
+
+### 🖥️ Frontend
+
+<img src="https://img.shields.io/badge/Next.js_16-000000?logo=nextdotjs&logoColor=white" alt="Next.js 16">
+<img src="https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black" alt="React 19">
+<img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+<img src="https://img.shields.io/badge/shadcn%2Fui-000000?logo=shadcnui&logoColor=white" alt="shadcn/ui">
+
+</td>
+<td width="50%">
+
+### ⚙️ Backend
+
+<img src="https://img.shields.io/badge/Java_17%2B-ED8B00?logo=openjdk&logoColor=white" alt="Java 17+">
+<img src="https://img.shields.io/badge/Spring_Boot_4.1.1-6DB33F?logo=springboot&logoColor=white" alt="Spring Boot 4.1.1">
+<img src="https://img.shields.io/badge/Spring_Security-6DB33F?logo=springsecurity&logoColor=white" alt="Spring Security">
+<img src="https://img.shields.io/badge/Spring_AI-6DB33F?logo=spring&logoColor=white" alt="Spring AI">
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 🤖 AI & RAG
+
+<img src="https://img.shields.io/badge/Google_GenAI-4285F4?logo=google&logoColor=white" alt="Google GenAI">
+<img src="https://img.shields.io/badge/Gemini-4285F4?logo=google&logoColor=white" alt="Gemini">
+<img src="https://img.shields.io/badge/pgvector-336791?logo=postgresql&logoColor=white" alt="pgvector">
+
+</td>
+<td>
+
+### 🗄️ Data & Persistence
+
+<img src="https://img.shields.io/badge/PostgreSQL_16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL 16">
+<img src="https://img.shields.io/badge/Flyway-CC0200?logo=flyway&logoColor=white" alt="Flyway">
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+### 🔗 Integration
+
+<img src="https://img.shields.io/badge/GitHub_API-181717?logo=github&logoColor=white" alt="GitHub API">
+<img src="https://img.shields.io/badge/GitHub_OAuth2-181717?logo=github&logoColor=white" alt="GitHub OAuth2">
+
+</td>
+<td>
+
+### 🛠️ Development
+
+<img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" alt="Docker">
+<img src="https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white" alt="Maven">
+<img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white" alt="Git">
+
+</td>
+</tr>
+</table>
+</div>
+
+---
+
+## Related Topics
+
+`AI` · `RAG` · `Codebase Assistant` · `GitHub` · `Developer Tools` · `Semantic Search` · `Code Intelligence`
 
 ---
 
 ## Project Structure
 
 ```text
-
 RepoBeacon/
-│
 ├── backend/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   └── resources/
-│   │   └── test/
-│   ├── pom.xml
-│   └── mvnw
-│
+│   └── src/main/java/com/repobeacon/backend/
+│       ├── config/
+│       ├── controllers/
+│       ├── dto/
+│       ├── entity/
+│       ├── repository/
+│       ├── security/
+│       └── services/
 ├── client/
 │   ├── app/
 │   ├── components/
 │   ├── hooks/
 │   ├── lib/
-│   ├── providers/
-│   └── package.json
-│
+│   └── providers/
+├── docs/
 ├── docker/
-│   └── postgres/
-│
-├── docker-compose.yml
-└── README.md
-
+└── docker-compose.yml
 ```
 
 ---
@@ -165,59 +222,68 @@ RepoBeacon/
 
 ### Prerequisites
 
-Make sure you have the following installed:
-
-- Java
+- Java 17+
+- Node.js 20+
 - Maven
-- Node.js
-- npm
-- Docker
-- Docker Compose
-- PostgreSQL client (optional)
+- Docker and Docker Compose
+- PostgreSQL with pgvector
+- GitHub OAuth App credentials
+- Google AI Studio API key
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/MishraRoushankumar/RepoBeacon.git
 cd RepoBeacon
 ```
 
 ### 2. Start PostgreSQL
 
 ```bash
-docker compose up -d
+   docker compose up -d
 ```
 
-Check the containers:
+This starts the PostgreSQL service configured for RepoBeacon, including the required pgvector extension.
 
-```bash
-docker compose ps
+### 3. Configure the Backend
+
+Create the required environment variables for GitHub OAuth and Google GenAI:
+
+```text
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key
+GOOGLE_GENAI_CHAT_MODEL=gemini-3.6-flash
+GOOGLE_GENAI_EMBEDDING_TEXT_MODEL=gemini-embedding-001
+
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+TOKEN_ENCRYPTOR_PASSWORD=your_encryption_password
+TOKEN_ENCRYPTOR_SALT=your_encryption_salt
 ```
 
-### 3. Configure environment variables
+The default database configuration connects to:
 
-Create the required environment variables for the backend and frontend.
+```text
+PostgreSQL
+Host: localhost
+Port: 5442
+Database: repobeacon
+Username: postgres
+Password: postgres
+```
 
-The application requires GitHub OAuth credentials for authentication.
-
-> Do not commit secrets or credentials to the repository.
-
-### 4. Start the backend
+### 4.Start the backend:
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-The backend runs on:
+> The Spring Boot backend runs on port `8080`.
 
-```bash
-http://localhost:8080
-```
+### 4. Start the Frontend
 
-### 5. Start the frontend
-
-From the project root:
+In a separate terminal:
 
 ```bash
 cd client
@@ -225,109 +291,56 @@ npm install
 npm run dev
 ```
 
-The frontend runs on:
-
-```bash
-http://localhost:3000
-```
+> The Next.js development server runs on port `3000`.
 
 ---
 
-## Authentication
+## Documentation
 
-RepoBeacon currently uses GitHub OAuth2 for authentication.
-The authentication flow is:
+Detailed architecture and implementation guides are available in the [`docs/`](docs/) directory.
 
-```mermaid
-flowchart TD
-    U[User] --> L[RepoBeacon Login]
-    L --> G[GitHub OAuth]
-    G --> A[GitHub Authorization]
-    A --> B[RepoBeacon Backend]
-    B --> S[User Session]
-    S --> D[Dashboard]
-```
+| Document                                           | Description                                                     |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| [Architecture](docs/architecture.md)               | System architecture and component responsibilities              |
+| [Authentication](docs/authentication.md)           | GitHub OAuth2 authentication flow                               |
+| [Repository Sync](docs/repository-sync.md)         | GitHub repository synchronization flow                          |
+| [Repository Indexing](docs/repository-indexing.md) | Code filtering, chunking, embeddings, and indexing              |
+| [RAG Chat](docs/rag-chat.md)                       | Retrieval, prompt construction, Gemini streaming, and citations |
+| [Data Model](docs/data-model.md)                   | Database entities and relationships                             |
 
-## GitHub access tokens are handled by the backend and are not intended to be exposed to the frontend.
+---
 
-## Development Roadmap
+## Roadmap
 
-### v1.0.0 — App Shell
+- [x] **v2.0.0 — RAG & GenAI**
+  - Repository indexing and vector retrieval
+  - Gemini-powered RAG chat
+  - SSE streaming and persistent sessions
+  - Source citations
 
-The first major milestone focuses on establishing the complete application foundation.
+### Next
 
-#### Authentication
-
-- [x] GitHub OAuth login
-- [x] User/session handling
-- [x] Authentication API
-
-#### Application
-
-- [x] Landing page
-- [x] Dashboard shell
-- [ ] Repository management
-- [ ] Repository synchronization
-- [ ] Settings
-- [ ] Complete application states
-
-#### Infrastructure
-
-- [x] Spring Boot backend
-- [x] Next.js frontend
-- [x] PostgreSQL
-- [x] Docker development environment
-- [ ] Flyway migrations
-- [ ] CI
-
-### v2.0.0 — RAG / GenAI
-
-The second major milestone will introduce the AI codebase assistant.
-
-- [ ] Repository indexing
-- [ ] Source-code fetching
-- [ ] Code chunking
-- [ ] OpenAI embeddings
-- [ ] pgvector storage
-- [ ] Semantic retrieval
-- [ ] RAG pipeline
-- [ ] Prompt/context construction
-- [ ] AI codebase chat
-- [ ] SSE streaming
-- [ ] Source-code citations
-- [ ] AI-specific loading/error states
+- [ ] Production deployment
+- [ ] CI/CD pipeline
+- [ ] Further RAG and retrieval improvements
 
 ---
 
 ## Git Workflow
 
-RepoBeacon follows a simple feature-based workflow:
+RepoBeacon follows a feature-branch workflow:
 
-```mermaid
-
-gitGraph
-    commit id: "initial"
-    branch develop
-    checkout develop
-    commit id: "development"
-    branch feature/auth
-    checkout feature/auth
-    commit id: "feature"
-    checkout develop
-    merge feature/auth
-    checkout main
-    merge develop tag: "v1.0.0"
+```text
+feature/* → develop → main
 ```
 
-Branches
+- `feature/*` — Individual features and changes
+- `develop` — Integration branch for completed features
+- `main` — Stable, release-ready code
 
-| Branch      | Purpose               |
-| ----------- | --------------------- |
-| `main`      | stable release branch |
-| `develop`   | integration branch    |
-| `feature/*` | individual features   |
+Feature branches are merged into `develop` through pull requests. Releases are promoted from `develop` to `main`.
 
-Feature branches should be created from develop and merged back through pull requests.
+---
 
 ---
 
@@ -335,6 +348,8 @@ Feature branches should be created from develop and merged back through pull req
 
 **RepoBeacon**
 
-Built to make codebases easier to understand.
+AI-powered codebase understanding for GitHub repositories
+
+Built with ❤️ using Next.js · Spring Boot · PostgreSQL · pgvector · Gemini
 
 </div>

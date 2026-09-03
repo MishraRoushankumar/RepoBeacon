@@ -1,9 +1,11 @@
 package com.repobeacon.backend.services;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final TextEncryptor tokenEncryptor;
+  private final BytesEncryptor tokenEncryptor;
 
   @Transactional
   public User upsertFromGitHub(Map<String, Object> attributes, String accessToken, String scopes) {
@@ -29,7 +31,8 @@ public class UserService {
         ? String.valueOf(attributes.get("avatar_url"))
         : null;
 
-    String encryptedToken = tokenEncryptor.encrypt(accessToken);
+    String encryptedToken = Base64.getEncoder().encodeToString(
+        tokenEncryptor.encrypt(accessToken.getBytes(StandardCharsets.UTF_8)));
 
     User user = userRepository.findByGithubId(githubId).orElseGet(User::new);
     user.setGithubId(githubId);
@@ -48,7 +51,8 @@ public class UserService {
   }
 
   public String decryptAccessToken(User user) {
-    return tokenEncryptor.decrypt(user.getAccessToken());
+    byte[] encryptedToken = Base64.getDecoder().decode(user.getAccessToken());
+    return new String(tokenEncryptor.decrypt(encryptedToken), StandardCharsets.UTF_8);
   }
 
   private static Long toLong(Object value) {
