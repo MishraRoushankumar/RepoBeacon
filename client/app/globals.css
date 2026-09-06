@@ -1,6 +1,6 @@
 @import url("https://fonts.cdnfonts.com/css/clash-display");
 @import url("https://fonts.cdnfonts.com/css/satoshi");
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Share+Tech+Mono&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -11,7 +11,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: "Share Tech Mono", monospace;
   --font-heading: var(--font-heading);
   --font-subheading: var(--font-subheading);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -77,7 +77,7 @@
   --destructive: oklch(0.637 0.208 25.331);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --success: oklch(0.723 0.192 149.579);
-  --warning: oklch(0.769 0.165 70.080);
+  --warning: oklch(0.769 0.165 70.08);
   --ai: oklch(0.606 0.219 292.717);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
@@ -99,7 +99,7 @@
 }
 
 .dark {
-  --background: oklch(0.144 0.012 258.440);
+  --background: oklch(0.144 0.012 258.44);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.204 0.024 262.258);
   --card-foreground: oklch(0.984 0.003 247.858);
@@ -116,7 +116,7 @@
   --destructive: oklch(0.637 0.208 25.331);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --success: oklch(0.723 0.192 149.579);
-  --warning: oklch(0.769 0.165 70.080);
+  --warning: oklch(0.769 0.165 70.08);
   --ai: oklch(0.606 0.219 292.717);
   --border: oklch(0.286 0.027 257.526);
   --input: oklch(0.286 0.027 257.526);
