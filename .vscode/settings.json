@@ -2,5 +2,5 @@
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.project.explorer.showNonJavaResources": false,
-  "markdown.validate.enabled": true
+  "markdown.validate.enabled": false
 }
