@@ -69,7 +69,10 @@ export class ApiError extends Error {
 }
 
 export function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080";
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/+$/, "") ||
+    "http://localhost:8080"
+  );
 }
 
 export function getGithubLoginUrl(next?: string) {
