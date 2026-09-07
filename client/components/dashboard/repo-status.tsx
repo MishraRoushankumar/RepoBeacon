@@ -24,11 +24,11 @@ export function IndexStatusBadge({
 }) {
   const variant =
     status === "READY"
-      ? "default"
+      ? "success"
       : status === "FAILED"
         ? "destructive"
         : status === "INDEXING"
-          ? "secondary"
+          ? "default"
           : "outline";
 
   return (
