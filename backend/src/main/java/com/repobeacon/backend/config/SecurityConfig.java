@@ -1,6 +1,5 @@
 package com.repobeacon.backend.config;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 
 import com.repobeacon.backend.security.GithubOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-
 
 @Configuration
 @EnableWebSecurity
@@ -49,8 +47,7 @@ public class SecurityConfig {
 						.requestMatchers("/api/**").authenticated()
 						.anyRequest().permitAll())
 				.exceptionHandling(ex -> ex
-						.authenticationEntryPoint(
-								new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+						.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 				.oauth2Login(oauth -> oauth
 						.userInfoEndpoint(userInfo -> userInfo
 								.userService(gitHubOAuth2UserService))
@@ -58,11 +55,11 @@ public class SecurityConfig {
 						.failureHandler(oauth2FailureHandler))
 				.logout(logout -> logout
 						.logoutUrl("/api/auth/logout")
-						.logoutSuccessHandler((request, response, authentication) -> response
-								.setStatus(HttpStatus.NO_CONTENT.value()))
+						.logoutSuccessHandler(
+								(request, response, authentication) -> response.setStatus(HttpStatus.NO_CONTENT.value()))
 						.invalidateHttpSession(true)
 						.clearAuthentication(true)
-						.deleteCookies("REPOBEACON_SESSION"));
+						.deleteCookies("DEVPILOT_SESSION"));
 
 		return http.build();
 	}
@@ -70,8 +67,7 @@ public class SecurityConfig {
 	@Bean
 	AuthenticationSuccessHandler oauth2SuccessHandler(
 			@Value("${app.frontend-url}") String frontendUrl) {
-		SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler() {
-		
+		SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
 		handler.setDefaultTargetUrl(frontendUrl + "/auth/callback");
 		return handler;
 	}
